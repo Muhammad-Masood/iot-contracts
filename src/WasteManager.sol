@@ -1,12 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.25;
 
-import {Ownable} from "@openzeppelin/contracts/ownership/Ownable.sol";
+import {Ownable} from "@openzeppelin/access/Ownable.sol";
 
 /// @title Waste Management Smart Contract for Smart City IoT System
 /// @notice Records bin fill data and emits events for high fill levels
-contract WasteManagement {
-    address public owner;
+contract WasteManagement is Ownable(msg.sender) {
     uint256 public fillThreshold = 90; // Threshold in percent
 
     struct Bin {
@@ -32,15 +31,6 @@ contract WasteManagement {
         uint256 fillLevel,
         uint256 timestamp
     );
-
-    modifier onlyOwner() {
-        require(msg.sender == owner, "Not authorized");
-        _;
-    }
-
-    constructor() {
-        owner = msg.sender;
-    }
 
     /**
     @notice Creates a new Bin
@@ -72,7 +62,7 @@ contract WasteManagement {
         require(_fillLevel <= 100, "Invalid fill level");
         Bin memory _bin = getBinById(_binId);
         if (_bin.binId == 0) {
-            createBin(_binId, _fillLevel);
+            createNewBin(_binId, _fillLevel);
         } else {
             bins[_binId].fillLevel = _fillLevel;
         }

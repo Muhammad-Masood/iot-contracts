@@ -20,7 +20,7 @@ contract WasteManagementTest is Test {
         vm.expectEmit(true, true, true, true);
         emit WasteManagement.BinDataRecorded(binId, fillLevel, block.timestamp);
 
-        wasteManagement.recordBinData(binId, fillLevel);
+        wasteManagement.updateBinData(binId, fillLevel);
 
         (uint256 storedBinId, uint256 storedFillLevel, ) = wasteManagement.bins(
             binId
@@ -39,7 +39,7 @@ contract WasteManagementTest is Test {
         vm.expectEmit(true, true, true, true);
         emit WasteManagement.BinFullAlert(binId, fillLevel, block.timestamp);
 
-        wasteManagement.recordBinData(binId, fillLevel);
+        wasteManagement.updateBinData(binId, fillLevel);
 
         (, uint256 storedFillLevel, ) = wasteManagement.bins(binId);
         assertEq(storedFillLevel, fillLevel);
@@ -56,8 +56,7 @@ contract WasteManagementTest is Test {
     function testUnauthorizedRecordBinData() public {
         address attacker = address(0xBEEF);
         vm.prank(attacker);
-
-        vm.expectRevert("Not authorized");
-        wasteManagement.recordBinData(3, 70);
+        vm.expectRevert();
+        wasteManagement.updateBinData(3, 70);
     }
 }
